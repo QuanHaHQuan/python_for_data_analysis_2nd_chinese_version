@@ -1,7 +1,3 @@
-本章讨论Python的内置功能，这些功能本书会用到很多。虽然扩展库，比如pandas和Numpy，使处理大数据集很方便，但它们是和Python的内置数据处理工具一同使用的。
-
-我们会从Python最基础的数据结构开始：元组、列表、字典和集合。然后会讨论创建你自己的、可重复使用的Python函数。最后，会学习Python的文件对象，以及如何与本地硬盘交互。
-
 # 3.1 数据结构和序列
 Python的数据结构简单而强大。通晓它们才能成为熟练的Python程序员。
 
@@ -102,34 +98,6 @@ In [19]: a, b, (c, d) = tup
 
 In [20]: d
 Out[20]: 7
-```
-
-使用这个功能，你可以很容易地替换变量的名字，其它语言可能是这样：
-
-```python
-tmp = a
-a = b
-b = tmp
-```
-
-但是在Python中，替换可以这样做：
-
-```python
-In [21]: a, b = 1, 2
-
-In [22]: a
-Out[22]: 1
-
-In [23]: b
-Out[23]: 2
-
-In [24]: b, a = a, b
-
-In [25]: a
-Out[25]: 2
-
-In [26]: b
-Out[26]: 1
 ```
 
 变量拆分常用来迭代元组或列表序列：
@@ -415,37 +383,6 @@ Out[82]: [1, 0, 6, 5, 3, 6, 3, 2, 7]
 
 ## 序列函数
 Python有一些有用的序列函数。
-
-## enumerate函数
-迭代一个序列时，你可能想跟踪当前项的序号。手动的方法可能是下面这样：
-
-```python
-i = 0
-for value in collection:
-   # do something with value
-   i += 1
-```
-
-因为这么做很常见，Python内建了一个``enumerate``函数，可以返回``(i, value)``元组序列：
-
-```python
-for i, value in enumerate(collection):
-   # do something with value
-```
-
-当你索引数据时，使用``enumerate``的一个好方法是计算序列（唯一的）``dict``映射到位置的值：
-
-```python
-In [83]: some_list = ['foo', 'bar', 'baz']
-
-In [84]: mapping = {}
-
-In [85]: for i, v in enumerate(some_list):
-   ....:     mapping[v] = i
-
-In [86]: mapping
-Out[86]: {'bar': 1, 'baz': 2, 'foo': 0}
-```
 
 ## sorted函数
 ``sorted``函数可以从任意序列的元素返回一个新的排好序的列表：
@@ -746,24 +683,6 @@ Out[140]: {3, 4, 5}
 表3-1列出了常用的集合方法。
 
 ![表3-1 Python的集合操作](http://upload-images.jianshu.io/upload_images/7178691-980efe5d98ecc4d6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-所有逻辑集合操作都有另外的原地实现方法，可以直接用结果替代集合的内容。对于大的集合，这么做效率更高：
-
-```python
-In [141]: c = a.copy()
-
-In [142]: c |= b
-
-In [143]: c
-Out[143]: {1, 2, 3, 4, 5, 6, 7, 8}
-
-In [144]: d = a.copy()
-
-In [145]: d &= b
-
-In [146]: d
-Out[146]: {3, 4, 5}
-```
 
 与字典类似，集合元素通常都是不可变的。要获得类似列表的元素，必须转换成元组：
 
