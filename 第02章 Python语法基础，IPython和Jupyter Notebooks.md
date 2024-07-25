@@ -226,60 +226,9 @@ if not isinstance(x, list) and isiterable(x):
     x = list(x)
 ```
 
-### 引入
-
-在Python中，模块就是一个有`.py`扩展名、包含Python代码的文件。假设有以下模块：
-
-```python
-# some_module.py
-PI = 3.14159
-
-def f(x):
-    return x + 2
-
-def g(a, b):
-    return a + b
-```
-
-如果想从同目录下的另一个文件访问`some_module.py`中定义的变量和函数，可以：
-
-```python
-import some_module
-result = some_module.f(5)
-pi = some_module.PI
-```
-
-或者：
-
-```python
-from some_module import f, g, PI
-result = g(5, PI)
-```
-
-使用`as`关键词，你可以给引入起不同的变量名：
-
-```python
-import some_module as sm
-from some_module import PI as pi, g as gf
-
-r1 = sm.f(pi)
-r2 = gf(6, pi)
-```
 
 ### 二元运算符和比较运算符
 
-大多数二元数学运算和比较都不难想到：
-
-```python
-In [32]: 5 - 7
-Out[32]: -2
-
-In [33]: 12 + 21.5
-Out[33]: 33.5
-
-In [34]: 5 <= 2
-Out[34]: False
-```
 
 表2-3列出了所有的二元运算符。
 
@@ -316,73 +265,6 @@ Out[42]: True
 ```
 
 ![&#x8868;2-3 &#x4E8C;&#x5143;&#x8FD0;&#x7B97;&#x7B26;](http://upload-images.jianshu.io/upload_images/7178691-9fb5f25b33166acf.png?imageMogr2/auto-orient/strip|imageView2/2/w/1240)
-
-### 可变与不可变对象
-
-Python中的大多数对象，比如列表、字典、NumPy数组，和用户定义的类型（类），都是可变的。意味着这些对象或包含的值可以被修改：
-
-```python
-In [43]: a_list = ['foo', 2, [4, 5]]
-
-In [44]: a_list[2] = (3, 4)
-
-In [45]: a_list
-Out[45]: ['foo', 2, (3, 4)]
-```
-
-其它的，例如字符串和元组，是不可变的：
-
-```python
-In [46]: a_tuple = (3, 5, (4, 5))
-
-In [47]: a_tuple[1] = 'four'
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-<ipython-input-47-b7966a9ae0f1> in <module>()
-----> 1 a_tuple[1] = 'four'
-TypeError: 'tuple' object does not support item assignment
-```
-
-记住，可以修改一个对象并不意味就要修改它。这被称为副作用。例如，当写一个函数，任何副作用都要在文档或注释中写明。如果可能的话，我推荐避免副作用，采用不可变的方式，即使要用到可变对象。
-
-### 标量类型
-
-Python的标准库中有一些内建的类型，用于处理数值数据、字符串、布尔值，和日期时间。这些单值类型被称为标量类型，本书中称其为标量。表2-4列出了主要的标量。日期和时间处理会另外讨论，因为它们是标准库的`datetime`模块提供的。
-
-![&#x8868;2-4 Python&#x7684;&#x6807;&#x91CF;](http://upload-images.jianshu.io/upload_images/7178691-27a30ac3e7d262a1.png?imageMogr2/auto-orient/strip|imageView2/2/w/1240)
-
-### 数值类型
-
-Python的主要数值类型是`int`和`float`。`int`可以存储任意大的数：
-
-```python
-In [48]: ival = 17239871
-
-In [49]: ival ** 6
-Out[49]: 26254519291092456596965462913230729701102721
-```
-
-浮点数使用Python的`float`类型。每个数都是双精度（64位）的值。也可以用科学计数法表示：
-
-```python
-In [50]: fval = 7.243
-
-In [51]: fval2 = 6.78e-5
-```
-
-不能得到整数的除法会得到浮点数：
-
-```python
-In [52]: 3 / 2
-Out[52]: 1.5
-```
-
-要获得C-风格的整除（去掉小数部分），可以使用底除运算符//：
-
-```python
-In [53]: 3 // 2
-Out[53]: 1
-```
 
 ### 字符串
 
