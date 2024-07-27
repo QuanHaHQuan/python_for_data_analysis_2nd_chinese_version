@@ -1037,23 +1037,6 @@ apply_to_list(ints, lambda x: x * 2)
 
 虽然你可以直接编写[x *2for x in ints]，但是这里我们可以非常轻松地传入一个自定义运算给apply_to_list函数。
 
-再来看另外一个例子。假设有一组字符串，你想要根据各字符串不同字母的数量对其进行排序：
-
-```python
-In [177]: strings = ['foo', 'card', 'bar', 'aaaa', 'abab']
-```
-
-这里，我们可以传入一个lambda函数到列表的sort方法：
-
-```python
-In [178]: strings.sort(key=lambda x: len(set(list(x))))
-
-In [179]: strings
-Out[179]: ['aaaa', 'foo', 'abab', 'bar', 'card']
-```
-
->笔记：lambda函数之所以会被称为匿名函数，与def声明的函数不同，原因之一就是这种函数对象本身是没有提供名称__name__属性。
-
 ## 柯里化：部分参数应用
 柯里化（currying）是一个有趣的计算机科学术语，它指的是通过“部分参数应用”（partial argument application）从现有函数派生出新函数的技术。例如，假设我们有一个执行两数相加的简单函数：
 
@@ -1178,146 +1161,6 @@ S ['Steven']
 表3-2中列出了一些我经常用到的itertools函数。建议参阅Python官方文档，进一步学习。
 
 ![表3-2 一些有用的itertools函数](http://upload-images.jianshu.io/upload_images/7178691-111823d8767a104d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-## 错误和异常处理
-优雅地处理Python的错误和异常是构建健壮程序的重要部分。在数据分析中，许多函数函数只用于部分输入。例如，Python的float函数可以将字符串转换成浮点数，但输入有误时，有``ValueError``错误：
-
-```python
-In [197]: float('1.2345')
-Out[197]: 1.2345
-
-In [198]: float('something')
----------------------------------------------------------------------------
-ValueError                                Traceback (most recent call last)
-<ipython-input-198-439904410854> in <module>()
-----> 1 float('something')
-ValueError: could not convert string to float: 'something'
-```
-
-假如想优雅地处理float的错误，让它返回输入值。我们可以写一个函数，在try/except中调用float：
-
-```python
-def attempt_float(x):
-    try:
-        return float(x)
-    except:
-        return x
-```
-
-当float(x)抛出异常时，才会执行except的部分：
-
-```python
-In [200]: attempt_float('1.2345')
-Out[200]: 1.2345
-
-In [201]: attempt_float('something')
-Out[201]: 'something'
-```
-
-你可能注意到float抛出的异常不仅是ValueError：
-
-```python
-In [202]: float((1, 2))
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-<ipython-input-202-842079ebb635> in <module>()
-----> 1 float((1, 2))
-TypeError: float() argument must be a string or a number, not 'tuple'
-```
-
-你可能只想处理ValueError，TypeError错误（输入不是字符串或数值）可能是合理的bug。可以写一个异常类型：
-
-```python
-def attempt_float(x):
-    try:
-        return float(x)
-    except ValueError:
-        return x
-```
-
-然后有：
-
-```python
-In [204]: attempt_float((1, 2))
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-<ipython-input-204-9bdfd730cead> in <module>()
-----> 1 attempt_float((1, 2))
-<ipython-input-203-3e06b8379b6b> in attempt_float(x)
-      1 def attempt_float(x):
-      2     try:
-----> 3         return float(x)
-      4     except ValueError:
-      5         return x
-TypeError: float() argument must be a string or a number, not 'tuple'
-```
-
-可以用元组包含多个异常：
-
-```python
-def attempt_float(x):
-    try:
-        return float(x)
-    except (TypeError, ValueError):
-        return x
-```
-
-某些情况下，你可能不想抑制异常，你想无论try部分的代码是否成功，都执行一段代码。可以使用finally：
-
-```python
-f = open(path, 'w')
-
-try:
-    write_to_file(f)
-finally:
-    f.close()
-```
-
-这里，文件处理f总会被关闭。相似的，你可以用else让只在try部分成功的情况下，才执行代码：
-
-```python
-f = open(path, 'w')
-
-try:
-    write_to_file(f)
-except:
-    print('Failed')
-else:
-    print('Succeeded')
-finally:
-    f.close()
-```
-
-## IPython的异常
-如果是在%run一个脚本或一条语句时抛出异常，IPython默认会打印完整的调用栈（traceback），在栈的每个点都会有几行上下文：
-
-```python
-In [10]: %run examples/ipython_bug.py
----------------------------------------------------------------------------
-AssertionError                            Traceback (most recent call last)
-/home/wesm/code/pydata-book/examples/ipython_bug.py in <module>()
-     13     throws_an_exception()
-     14
----> 15 calling_things()
-
-/home/wesm/code/pydata-book/examples/ipython_bug.py in calling_things()
-     11 def calling_things():
-     12     works_fine()
----> 13     throws_an_exception()
-     14
-     15 calling_things()
-
-/home/wesm/code/pydata-book/examples/ipython_bug.py in throws_an_exception()
-      7     a = 5
-      8     b = 6
-----> 9     assert(a + b == 10)
-     10
-     11 def calling_things():
-
-AssertionError:
-```
-
-自身就带有文本是相对于Python标准解释器的极大优点。你可以用魔术命令``%xmode``，从Plain（与Python标准解释器相同）到Verbose（带有函数的参数值）控制文本显示的数量。后面可以看到，发生错误之后，（用%debug或%pdb magics）可以进入stack进行事后调试。
 
 # 3.3 文件和操作系统
 本书的代码示例大多使用诸如pandas.read_csv之类的高级工具将磁盘上的数据文件读入Python数据结构。但我们还是需要了解一些有关Python文件处理方面的基础知识。好在它本来就很简单，这也是Python在文本和文件处理方面的如此流行的原因之一。
@@ -1534,8 +1377,3 @@ tart byte
 
 In [244]: f.close()
 ```
-
-如果你经常要对非ASCII字符文本进行数据分析，通晓Python的Unicode功能是非常重要的。更多内容，参阅Python官方文档。
-
-# 3.4 结论
-我们已经学过了Python的基础、环境和语法，接下来学习NumPy和Python的面向数组计算。
