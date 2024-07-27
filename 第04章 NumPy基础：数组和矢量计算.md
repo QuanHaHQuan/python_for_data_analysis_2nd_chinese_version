@@ -1267,12 +1267,3 @@ In [269]: crossing_times = (np.abs(walks[hits30]) >= 30).argmax(1)
 In [270]: crossing_times.mean()
 Out[270]: 498.88973607038122
 ```
-
-请尝试用其他分布方式得到漫步数据。只需使用不同的随机数生成函数即可，如normal用于生成指定均值和标准差的正态分布数据：
-```python
-In [271]: steps = np.random.normal(loc=0, scale=0.25,
-   .....:                          size=(nwalks, nsteps))
-```
-
-# 4.8 结论
-虽然本书剩下的章节大部分是用pandas规整数据，我们还是会用到相似的基于数组的计算。在附录A中，我们会深入挖掘NumPy的特点，进一步学习数组的技巧。
