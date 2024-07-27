@@ -28,111 +28,9 @@ Out[11]: (160, 40, 8)
 
 虽然NumPy用户很少会对数组的跨度信息感兴趣，但它们却是构建非复制式数组视图的重要因素。跨度甚至可以是负数，这样会使数组在内存中后向移动，比如在切片obj[::-1]或obj[:,::-1]中就是这样的。
 
-## NumPy数据类型体系
-
-你可能偶尔需要检查数组中所包含的是否是整数、浮点数、字符串或Python对象。因为浮点数的种类很多（从float16到float128），判断dtype是否属于某个大类的工作非常繁琐。幸运的是，dtype都有一个超类（比如np.integer和np.floating），它们可以跟np.issubdtype函数结合使用：
-```python
-In [12]: ints = np.ones(10, dtype=np.uint16)
-
-In [13]: floats = np.ones(10, dtype=np.float32)
-
-In [14]: np.issubdtype(ints.dtype, np.integer)
-Out[14]: True
-
-In [15]: np.issubdtype(floats.dtype, np.floating)
-Out[15]: True
-```
-
-调用dtype的mro方法即可查看其所有的父类：
-```python
-In [16]: np.float64.mro()
-Out[16]:
-[numpy.float64,
- numpy.floating,
- numpy.inexact,
- numpy.number,
- numpy.generic,
- float,
- object]
-```
-
-然后得到：
-```python
-In [17]: np.issubdtype(ints.dtype, np.number)
-Out[17]: True
-```
-
-大部分NumPy用户完全不需要了解这些知识，但是这些知识偶尔还是能派上用场的。图A-2说明了dtype体系以及父子类关系。
-
-![图A-2 NumPy的dtype体系](http://upload-images.jianshu.io/upload_images/7178691-b8996bf943a06ab9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
 # A.2 高级数组操作
 
 除花式索引、切片、布尔条件取子集等操作之外，数组的操作方式还有很多。虽然pandas中的高级函数可以处理数据分析工作中的许多重型任务，但有时你还是需要编写一些在现有库中找不到的数据算法。
-
-## 数组重塑
-
-多数情况下，你可以无需复制任何数据，就将数组从一个形状转换为另一个形状。只需向数组的实例方法reshape传入一个表示新形状的元组即可实现该目的。例如，假设有一个一维数组，我们希望将其重新排列为一个矩阵（结果见图A-3）：
-```python
-In [18]: arr = np.arange(8)
-
-In [19]: arr
-Out[19]: array([0, 1, 2, 3, 4, 5, 6, 7])
-
-In [20]: arr.reshape((4, 2))
-Out[20]: 
-array([[0, 1],
-       [2, 3],
-       [4, 5],
-       [6, 7]])
-```
-
-![图A-3 按C顺序（按行）和按Fortran顺序（按列）进行重塑](http://upload-images.jianshu.io/upload_images/7178691-95bbca6d8d04e4c7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-多维数组也能被重塑：
-```python
-In [21]: arr.reshape((4, 2)).reshape((2, 4))
-Out[21]: 
-array([[0, 1, 2, 3],
-       [4, 5, 6, 7]])
-```
-
-作为参数的形状的其中一维可以是－1，它表示该维度的大小由数据本身推断而来：
-```python
-In [22]: arr = np.arange(15)
-
-In [23]: arr.reshape((5, -1))
-Out[23]: 
-array([[ 0,  1,  2],
-       [ 3,  4,  5],
-       [ 6,  7,  8],
-       [ 9, 10, 11],
-       [12, 13, 14]])
-```
-
-与reshape将一维数组转换为多维数组的运算过程相反的运算通常称为扁平化（flattening）或散开（raveling）：
-```python
-In [27]: arr = np.arange(15).reshape((5, 3))
-
-In [28]: arr
-Out[28]: 
-array([[ 0,  1,  2],
-       [ 3,  4,  5],
-       [ 6,  7,  8],
-       [ 9, 10, 11],
-       [12, 13, 14]])
-
-In [29]: arr.ravel()
-Out[29]: array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14])
-```
-
-如果结果中的值与原始数组相同，ravel不会产生源数据的副本。flatten方法的行为类似于ravel，只不过它总是返回数据的副本：
-```python
-In [30]: arr.flatten()
-Out[30]: array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14])
-```
-
-数组可以被重塑或散开为别的顺序。这对NumPy新手来说是一个比较微妙的问题，所以在下一小节中我们将专门讲解这个问题。
 
 ## C和Fortran顺序
 
@@ -166,25 +64,6 @@ Out[34]: array([ 0,  4,  8,  1,  5,  9,  2,  6, 10,  3,  7, 11])
 
 
 ## 数组的合并和拆分
-
-numpy.concatenate可以按指定轴将一个由数组组成的序列（如元组、列表等）连接到一起：
-```python
-In [35]: arr1 = np.array([[1, 2, 3], [4, 5, 6]])
-
-In [36]: arr2 = np.array([[7, 8, 9], [10, 11, 12]])
-
-In [37]: np.concatenate([arr1, arr2], axis=0)
-Out[37]: 
-array([[ 1,  2,  3],
-       [ 4,  5,  6],
-       [ 7,  8,  9],
-       [10, 11, 12]])
-
-In [38]: np.concatenate([arr1, arr2], axis=1)
-Out[38]: 
-array([[ 1,  2,  3,  7,  8,  9],
-       [ 4,  5,  6, 10, 11, 12]])
-```
 
 对于常见的连接操作，NumPy提供了一些比较方便的方法（如vstack和hstack）。因此，上面的运算还可以表达为：
 ```python
